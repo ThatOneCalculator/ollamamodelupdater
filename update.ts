@@ -1,4 +1,4 @@
-import { Ollama } from "ollama-node@0.1.13";
+import { Ollama } from "ollama-node";
 
 const ollama = new Ollama();
 
