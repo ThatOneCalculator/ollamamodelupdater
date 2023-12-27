@@ -14,10 +14,20 @@ jobs:
           bun install
           bun build ./update.ts --compile --minify --outfile ollamamodelupdater
   
-      - name: Release
-        uses: softprops/action-gh-release@v1
+  release:
+    needs: compile
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: |
+          bun install
+          bun build ./update.ts --compile --minify --outfile ollamamodelupdater
+      - uses: actions/upload-release-asset@v1
         with:
-          tag_name: ${{ github.ref }}
-          files: |
-            ollamamodelupdater
-          token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./ollamamodelupdater
+          asset_name: ollamamodelupdater
+          asset_content_type: application/octet-stream
+          github_token: ${{ secrets.GITHUB_TOKEN }}
