@@ -1,4 +1,4 @@
-name: Deno Compile
+name: Bun Compile
 on:
   push:
     branches:
