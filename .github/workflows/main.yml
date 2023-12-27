@@ -10,7 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
-      - run: 
+      - run: |
+          bun install
           bun build ./update.ts --compile --minify --outfile ollamamodelupdater
   
       - name: Release
