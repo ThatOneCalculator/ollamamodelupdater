@@ -16,9 +16,8 @@ jobs:
   
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: ${{ needs.changelog.outputs.skipped == 'false' }}
         with:
-          tag_name: ${{ needs.changelog.outputs.tag }}
+          tag_name: ${{ github.ref }}
           files: |
             ollamamodelupdater
           token: ${{ secrets.GITHUB_TOKEN }}
