@@ -39,12 +39,10 @@ for await (const model of localModels) {
   }
 }
 
-for (const model of outdated) {
+for await (const model of outdated) {
   console.log(`Updating ${model.name}`);
-  const { stdout, stderr } = Bun.spawn(["ollama", "pull", model.name]);
-  const stdoutStr = await new Response(stdout).text();
-  const stderrStr = await new Response(stderr).text();
-  console.log("STDOUT:", stdoutStr, ", STDERR:", stderrStr);
+  const proc = Bun.spawn(["ollama", "pull", model.name]);
+  await proc.exited;
 }
 
 async function jsonhash(json: string) {
