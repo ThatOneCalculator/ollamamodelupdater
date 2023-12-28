@@ -31,16 +31,16 @@ for await (const model of localModels) {
 
     const hash = await jsonhash(remoteModelInfoJSON);
     if (hash === localdigest) {
-      console.log(`You have the latest ${model.name}`);
+      console.log(`✅ ${model.name}`);
     } else {
-      console.log(`You have an outdated version of ${model.name}`);
+      console.log(`⚠️ ${model.name}`);
       outdated.push(model);
     }
   }
 }
 
 for await (const model of outdated) {
-  console.log(`Updating ${model.name}`);
+  console.log(`🆙 Updating ${model.name}`);
   const proc = Bun.spawn(["ollama", "pull", model.name]);
   await proc.exited;
 }
