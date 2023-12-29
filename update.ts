@@ -1,13 +1,31 @@
 import { Ollama } from "ollama-node";
 import { Spinner } from "@paperdave/logger";
+import { Command } from "commander";
 
 const ollama = new Ollama();
+const program = new Command();
+
+function commaSeparatedList(value, dummyPrevious) {
+  return value.split(",");
+}
+
+program.option("-s, --skip <models>", "Models to skip (seperated by commas)", commaSeparatedList);
+
+program.parse();
 
 const local_models_raw = await ollama.listModels();
-const localModels = local_models_raw.complete.map((model) => ({
+let localModels = local_models_raw.complete.map((model) => ({
   name: model.name,
   digest: model.digest,
 }));
+
+const options = program.opts();
+const skips = options.skip;
+if (skips) {
+  localModels = localModels.filter(
+    (model) => !skips.includes(model.name) && !skips.includes(model.digest)
+  );
+}
 
 const spinner = new Spinner("Grabbing latest model data");
 

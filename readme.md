@@ -4,6 +4,8 @@ The Ollama Model Updater will look at all the models you have on your system, ch
 
 ![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/assets/44733677/86b5fd81-5bbc-437c-8141-cb1e94b3d701)
 
+Skip your local models with the `-s` flag, i.e. `ollamaupdater -s linux-terminal:latest,test-modelfile:latest`
+
 You can compile the executable with
 
 ```sh
