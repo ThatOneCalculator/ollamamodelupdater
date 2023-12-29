@@ -9,7 +9,11 @@ function commaSeparatedList(value, dummyPrevious) {
   return value.split(",");
 }
 
-program.option("-s, --skip <models>", "Models to skip (seperated by commas)", commaSeparatedList);
+program.option(
+  "-s, --skip <models>",
+  "Models to skip (seperated by commas)",
+  commaSeparatedList
+);
 
 program.parse();
 
@@ -31,12 +35,12 @@ const spinner = new Spinner("Grabbing latest model data");
 
 const outdated = new Array<any>();
 const checked = new Array<any>();
-const failed = new Array<any>();
+const notices = new Array<any>();
 
 function bottomlog() {
   return `(${checked.length}/${localModels.length}) ${checked.join(
     ""
-  )}\n${outdated.map((model) => model.name).join(" 🆙\n")}${failed.join("")}`;
+  )}\n${notices.join("")}`;
 }
 
 for await (const model of localModels) {
@@ -65,11 +69,12 @@ for await (const model of localModels) {
       checked.push("✅");
     } else {
       checked.push("🆙");
+      notices.push(`\n🆙 Update available for ${model.name}!`);
       outdated.push(model);
     }
   } else {
     checked.push("⚠️");
-    failed.push(`\n⚠️ Couldn't check ${model.name}!`);
+    notices.push(`\n⚠️ Couldn't check ${model.name}!`);
   }
 }
 spinner.success(`Done!\n${bottomlog()}`);
