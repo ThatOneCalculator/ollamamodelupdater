@@ -1,6 +1,7 @@
 {
   "version": "0.1.7",
   "dependencies": {
+    "@paperdave/logger": "^3.0.1",
     "ollama-node": "^0.1.27"
   }
 }

@@ -1,4 +1,5 @@
 import { Ollama } from "ollama-node";
+import { Spinner } from "@paperdave/logger";
 
 const ollama = new Ollama();
 
@@ -7,9 +8,21 @@ const localModels = local_models_raw.complete.map((model) => ({
   name: model.name,
   digest: model.digest,
 }));
+
+const spinner = new Spinner("Grabbing latest model data");
+
 const outdated = new Array<any>();
+const checked = new Array<any>();
+const failed = new Array<any>();
+
+function bottomlog() {
+  return `(${checked.length}/${localModels.length}) ${checked.join(
+    ""
+  )}\n${outdated.map((model) => model.name).join(" 🆙\n")}${failed.join("")}`;
+}
 
 for await (const model of localModels) {
+  spinner.update(`Checking ${model.name}\n${bottomlog()}`);
   const localdigest = model.digest;
   let [repo, tag] = model.name.split(":");
 
@@ -31,16 +44,20 @@ for await (const model of localModels) {
 
     const hash = await jsonhash(remoteModelInfoJSON);
     if (hash === localdigest) {
-      console.log(`✅ ${model.name}`);
+      checked.push("✅");
     } else {
-      console.log(`⚠️ ${model.name}`);
+      checked.push("🆙");
       outdated.push(model);
     }
+  } else {
+    checked.push("⚠️");
+    failed.push(`\n⚠️ Couldn't check ${model.name}!`);
   }
 }
+spinner.success(`Done!\n${checked.join("")}`);
 
 for await (const model of outdated) {
-  console.log(`🆙 Updating ${model.name}`);
+  console.log(`\n✨ Updating ${model.name}`);
   const proc = Bun.spawn(["ollama", "pull", model.name]);
   await proc.exited;
 }
