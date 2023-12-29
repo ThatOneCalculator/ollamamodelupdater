@@ -54,7 +54,7 @@ for await (const model of localModels) {
     failed.push(`\n⚠️ Couldn't check ${model.name}!`);
   }
 }
-spinner.success(`Done!\n${checked.join("")}`);
+spinner.success(`Done!\n${bottomlog()}`);
 
 for await (const model of outdated) {
   console.log(`\n✨ Updating ${model.name}`);
