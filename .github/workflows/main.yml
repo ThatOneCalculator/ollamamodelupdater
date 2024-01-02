@@ -9,25 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: |
-          bun install
-          bun build ./update.ts --compile --minify --outfile ollamamodelupdater
-  
-  release:
-    needs: compile
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
-      - run: |
-          bun install
-          bun build ./update.ts --compile --minify --outfile ollamamodelupdater
-      - uses: actions/upload-release-asset@v1
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+      - name: Install dependencies
+        run: bun install
+      - name: Compile executable (Linux)
+        run: bun build ./update.ts --compile --minify --outfile ollamamodelupdater
+      # ref: https://stackoverflow.com/a/71835483
+      - name: Upload binary to release
+        uses: softprops/action-gh-release@v1
+        if: ${{startsWith(github.ref, 'refs/tags/') }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./ollamamodelupdater
-          asset_name: ollamamodelupdater
-          asset_content_type: application/octet-stream
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: ollamamodelupdater
