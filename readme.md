@@ -1,10 +1,10 @@
 # Ollama Model Updater
 
-The Ollama Model Updater will look at all the models you have on your system, check if there is a different version on ollama.ai, and pull the model if there is.
+The Ollama Model Updater will look at all the models you have on your system, check if there is a different version on https://ollama.ai, and pull the model if there is.
 
-![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
+![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
 
-![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/assets/44733677/86b5fd81-5bbc-437c-8141-cb1e94b3d701)
+![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/86b5fd81-5bbc-437c-8141-cb1e94b3d701)
 
 ## CLI Options
 
@@ -37,12 +37,15 @@ yay -S ollamamodelupdater #-bin
 You can compile and install the executable with
 
 ```sh
-git clone https://github.com/ThatOneCalculator/ollamamodelupdater-bun.git
-cd ollamamodelupdater-bun/
+git clone https://github.com/ThatOneCalculator/ollamamodelupdater.git
+cd ollamamodelupdater/
 bun build ./update.ts --compile --minify --outfile ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
 
-### Prebuilt binary
+Or get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
 
-You can get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
+```sh
+curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v0.5.3/ollamamodelupdater
+sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
+```
