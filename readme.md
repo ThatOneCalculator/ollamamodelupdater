@@ -22,7 +22,7 @@ Options:
 
 ## Building/Installing
 
-[![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml)
+[![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml) [![Release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml)
 
 You can compile and install the executable with
 

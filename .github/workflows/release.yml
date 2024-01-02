@@ -1,4 +1,4 @@
-name: Bun Compile
+name: Release
 on:
   push:
     tags: "v*.*.*"
