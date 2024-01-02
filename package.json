@@ -1,8 +1,12 @@
 {
-  "version": "0.1.7",
+  "version": "0.5.0",
   "dependencies": {
+    "@inquirer/prompts": "^3.3.0",
     "@paperdave/logger": "^3.0.1",
     "commander": "^11.1.0",
     "ollama-node": "^0.1.27"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0"
   }
 }
