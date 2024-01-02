@@ -32,3 +32,5 @@ cd ollamamodelupdater-bun/
 bun build ./update.ts --compile --minify --outfile ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
+
+Or get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
