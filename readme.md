@@ -22,10 +22,13 @@ Options:
 
 ## Building/Installing
 
-You can compile the executable with
+[![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml)
+
+You can compile and install the executable with
 
 ```sh
+git clone https://github.com/ThatOneCalculator/ollamamodelupdater-bun.git
+cd ollamamodelupdater-bun/
 bun build ./update.ts --compile --minify --outfile ollamamodelupdater
+sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
-
-Or grab the prebuilt binary for Linux from the [releases page](https://github.com/thatonecalculator/ollamamodelupdater-bun/releases).
