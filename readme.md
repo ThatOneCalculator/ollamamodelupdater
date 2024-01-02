@@ -22,6 +22,16 @@ Options:
 
 ## Building/Installing
 
+### AUR
+
+[![Ollama AUR package](https://img.shields.io/aur/version/:ollamamodelupdater?logo=archlinux&label=AUR%20ollamamodelupdater)](https://aur.archlinux.org/packages/ollamamodelupdater) [![Ollama AUR package bin version](https://img.shields.io/aur/version/:ollamamodelupdater-bin?logo=archlinux&label=AUR%20ollamamodelupdater-bin)](https://aur.archlinux.org/packages/ollamamodelupdater-bin)
+
+```sh
+yay -S ollamamodelupdater #-bin
+```
+
+### From source
+
 [![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml) [![Release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml)
 
 You can compile and install the executable with
@@ -33,4 +43,6 @@ bun build ./update.ts --compile --minify --outfile ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
 
-Or get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
+### Prebuilt binary
+
+You can get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
