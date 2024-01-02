@@ -1,5 +1,7 @@
 name: Bun Compile
-on: push
+on:
+  push:
+    tags: "v*.*.*"
       
 jobs: 
   compile:
@@ -12,4 +14,8 @@ jobs:
         run: bun install
       - name: Compile executable (Linux)
         run: bun build ./update.ts --compile --minify --outfile ollamamodelupdater
-
+      # ref: https://stackoverflow.com/a/71835483
+      - name: Upload binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ollamamodelupdater
