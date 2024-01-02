@@ -1,22 +1,25 @@
 import { Ollama } from "ollama-node";
 import { Spinner } from "@paperdave/logger";
 import { Command } from "commander";
+import { confirm } from "@inquirer/prompts";
 
-const ollama = new Ollama();
 const program = new Command();
-
-function commaSeparatedList(value, dummyPrevious) {
+function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
-
 program.option(
   "-s, --skip <models>",
   "Models to skip (seperated by commas)",
   commaSeparatedList
 );
-
+program.option(
+  "-c, --confirm",
+  "Enable confirmation dialog before upgrading",
+  false
+);
 program.parse();
 
+const ollama = new Ollama();
 const local_models_raw = await ollama.listModels();
 let localModels = local_models_raw.complete.map((model) => ({
   name: model.name,
@@ -31,11 +34,9 @@ if (skips) {
   );
 }
 
-const spinner = new Spinner("Grabbing latest model data");
-
-const outdated = new Array<any>();
-const checked = new Array<any>();
-const notices = new Array<any>();
+const outdated = new Array<{ name: string; digest: string }>();
+const checked = new Array<string>();
+const notices = new Array<string>();
 
 function bottomlog() {
   return `(${checked.length}/${localModels.length}) ${checked.join(
@@ -43,6 +44,15 @@ function bottomlog() {
   )}\n${notices.join("")}`;
 }
 
+async function jsonhash(json: string) {
+  const jsonstring = JSON.stringify(json).replace(/\s+/g, "");
+  const messageBuffer = new TextEncoder().encode(jsonstring);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", messageBuffer);
+  const hash = Buffer.from(hashBuffer).toString("hex");
+  return hash;
+}
+
+const spinner = new Spinner("Grabbing latest model data");
 for await (const model of localModels) {
   spinner.update(`Checking ${model.name}\n${bottomlog()}`);
   const localdigest = model.digest;
@@ -62,7 +72,7 @@ for await (const model of localModels) {
   );
 
   if (remoteModelInfo.status == 200) {
-    const remoteModelInfoJSON = await remoteModelInfo.json();
+    const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
 
     const hash = await jsonhash(remoteModelInfoJSON);
     if (hash === localdigest) {
@@ -79,17 +89,23 @@ for await (const model of localModels) {
 }
 spinner.success(`Done!\n${bottomlog()}`);
 
+if (outdated.length === 0) {
+  console.log("👍 All models up-to-date!");
+  process.exit(0);
+}
+
+if (options.confirm) {
+  const answer = await confirm({
+    message: `Update ${outdated.map((model) => model.name).join(", ")}?`,
+    default: true,
+  });
+  if (answer == false) {
+    process.exit(0);
+  }
+}
+
 for await (const model of outdated) {
   console.log(`\n✨ Updating ${model.name}`);
   const proc = Bun.spawn(["ollama", "pull", model.name]);
   await proc.exited;
-}
-
-async function jsonhash(json: string) {
-  const jsonstring = JSON.stringify(json).replace(/\s+/g, "");
-  const messageBuffer = new TextEncoder().encode(jsonstring);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", messageBuffer);
-  const hash = Buffer(hashBuffer).toString("hex");
-
-  return hash;
 }
