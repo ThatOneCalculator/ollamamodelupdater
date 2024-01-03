@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "dependencies": {
     "@inquirer/prompts": "^3.3.0",
     "@paperdave/logger": "^3.0.1",

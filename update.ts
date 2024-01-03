@@ -17,6 +17,7 @@ program.option(
   "Enable confirmation dialog before upgrading",
   false
 );
+program.option("-v, --verbose", "Verbose output", false);
 program.parse();
 
 const ollama = new Ollama();
@@ -27,6 +28,7 @@ let localModels = local_models_raw.complete.map((model) => ({
 }));
 
 const options = program.opts();
+const verbose = options.verbose;
 const skips = options.skip;
 if (skips) {
   localModels = localModels.filter(
@@ -34,9 +36,19 @@ if (skips) {
   );
 }
 
-const outdated = new Array<{ name: string; digest: string }>();
+type Model = { name: string; digest: string };
+type VerboseLog = {
+  model: string;
+  status: string;
+  localDigest: string;
+  remoteDigest: string;
+  message?: string;
+};
+
+const outdated = new Array<Model>();
 const checked = new Array<string>();
 const notices = new Array<string>();
+const logs = new Array<VerboseLog>();
 
 function bottomlog() {
   return `(${checked.length}/${localModels.length}) ${checked.join(
@@ -53,7 +65,7 @@ async function jsonhash(json: string) {
 }
 
 const spinner = new Spinner("Grabbing latest model data");
-async function checkModel(model) {
+async function checkModel(model: Model) {
   const localdigest = model.digest;
   let [repo, tag] = model.name.split(":");
 
@@ -61,9 +73,18 @@ async function checkModel(model) {
     repo = `library/${repo}`;
   }
 
-  function modelError() {
+  function modelError(error) {
     checked.push("⚠️");
-    notices.push(`\n⚠️ Couldn't check ${model.name}!`);
+    notices.push(`\n⚠️ Couldn't check ${model.name} due to ${error}!`);
+    if (verbose) {
+      logs.push({
+        model: model.name,
+        status: "⚠️",
+        localDigest: model.digest.substring(0, 12),
+        remoteDigest: "unknown",
+        message: error,
+      });
+    }
   }
 
   try {
@@ -81,24 +102,38 @@ async function checkModel(model) {
       const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
       const hash = await jsonhash(remoteModelInfoJSON);
 
-      if (hash === localdigest) {
-        checked.push("✅");
-      } else {
-        checked.push("🆙");
+      let status = "✅";
+      const update = hash !== localdigest;
+      if (update) {
+        status = "🆙";
         notices.push(`\n🆙 Update available for ${model.name}!`);
         outdated.push(model);
       }
+      checked.push(status);
+      if (verbose) {
+        logs.push({
+          model: model.name,
+          status: status,
+          message: update ? "Update available" : "Up-to-date",
+          localDigest: model.digest.substring(0, 12),
+          remoteDigest: hash.substring(0, 12),
+        });
+      }
     } else {
-      modelError();
+      modelError(`model status: ${remoteModelInfo.status}`);
     }
   } catch (error) {
-    modelError();
-    console.error(error.message);
+    modelError(`caught error: ${error.message}`);
   }
 }
 
 await Promise.all(localModels.map((model) => checkModel(model)));
+
 spinner.success(`Done!\n${bottomlog()}`);
+
+if (verbose) {
+  console.table(logs);
+}
 
 if (outdated.length === 0) {
   console.log("👍 All models up-to-date!");
