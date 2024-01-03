@@ -1,5 +1,5 @@
 import { Ollama } from "ollama-node";
-import { Spinner } from "@paperdave/logger";
+import { Progress } from "@paperdave/logger";
 import { Command } from "commander";
 import { confirm } from "@inquirer/prompts";
 
@@ -18,7 +18,14 @@ program.option(
   false
 );
 program.option("-v, --verbose", "Verbose output", false);
+program.option("--version", "Print current version and exit");
 program.parse();
+const options = program.opts();
+
+if (options.version) {
+  console.log("v0.8.0 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater");
+  process.exit(0);
+}
 
 const ollama = new Ollama();
 const local_models_raw = await ollama.listModels();
@@ -27,8 +34,6 @@ let localModels = local_models_raw.complete.map((model) => ({
   digest: model.digest,
 }));
 
-const options = program.opts();
-const verbose = options.verbose;
 const skips = options.skip;
 if (skips) {
   localModels = localModels.filter(
@@ -50,12 +55,6 @@ const checked = new Array<string>();
 const notices = new Array<string>();
 const logs = new Array<VerboseLog>();
 
-function bottomlog() {
-  return `(${checked.length}/${localModels.length}) ${checked.join(
-    ""
-  )}\n${notices.join("")}`;
-}
-
 async function jsonhash(json: string) {
   const jsonstring = JSON.stringify(json).replace(/\s+/g, "");
   const messageBuffer = new TextEncoder().encode(jsonstring);
@@ -64,7 +63,14 @@ async function jsonhash(json: string) {
   return hash;
 }
 
-const spinner = new Spinner("Grabbing latest model data");
+const progress = new Progress("Grabbing latest model data");
+progress.total = localModels.length;
+
+function updateProgress(modelname: string) {
+  progress.value = checked.length;
+  progress.text = `Checking ${modelname}\n${notices.join("")}`;
+}
+
 async function checkModel(model: Model) {
   const localdigest = model.digest;
   let [repo, tag] = model.name.split(":");
@@ -73,70 +79,55 @@ async function checkModel(model: Model) {
     repo = `library/${repo}`;
   }
 
-  function modelError(error) {
-    checked.push("⚠️");
-    notices.push(`\n⚠️ Couldn't check ${model.name} due to ${error}!`);
-    if (verbose) {
-      logs.push({
-        model: model.name,
-        status: "⚠️",
-        localDigest: model.digest.substring(0, 12),
-        remoteDigest: "unknown",
-        message: error,
-      });
+  const remoteModelInfo = await fetch(
+    `https://ollama.ai/v2/${repo}/manifests/${tag}`,
+    {
+      headers: {
+        Accept: "application/vnd.docker.distribution.manifest.v2+json",
+      },
     }
+  );
+  updateProgress(model.name);
+
+  let status = "✅";
+  let message = "Up-to-date";
+  let hash = "Unknown";
+  if (remoteModelInfo.status === 200) {
+    const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
+    hash = await jsonhash(remoteModelInfoJSON);
+    const update = hash !== localdigest;
+    if (update) {
+      status = "🆙";
+      message = "Update available";
+      notices.push(`\n${status} ${message} for ${model.name}!`);
+      outdated.push(model);
+    }
+    checked.push(status);
+  } else {
+    status = "⚠️";
+    message = `model status: ${remoteModelInfo.status}`;
+    notices.push(`\n${status} Couldn't check ${model.name} due to ${message}!`);
   }
-
-  try {
-    const remoteModelInfo = await fetch(
-      `https://ollama.ai/v2/${repo}/manifests/${tag}`,
-      {
-        headers: {
-          Accept: "application/vnd.docker.distribution.manifest.v2+json",
-        },
-      }
-    );
-    spinner.update(`Checking ${model.name}\n${bottomlog()}`);
-
-    if (remoteModelInfo.status === 200) {
-      const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
-      const hash = await jsonhash(remoteModelInfoJSON);
-
-      let status = "✅";
-      const update = hash !== localdigest;
-      if (update) {
-        status = "🆙";
-        notices.push(`\n🆙 Update available for ${model.name}!`);
-        outdated.push(model);
-      }
-      checked.push(status);
-      if (verbose) {
-        logs.push({
-          model: model.name,
-          status: status,
-          message: update ? "Update available" : "Up-to-date",
-          localDigest: model.digest.substring(0, 12),
-          remoteDigest: hash.substring(0, 12),
-        });
-      }
-    } else {
-      modelError(`model status: ${remoteModelInfo.status}`);
-    }
-  } catch (error) {
-    modelError(`caught error: ${error.message}`);
+  if (options.verbose) {
+    logs.push({
+      model: model.name,
+      status: status,
+      message: message,
+      localDigest: model.digest.substring(0, 12),
+      remoteDigest: hash.substring(0, 12),
+    });
   }
 }
 
 await Promise.all(localModels.map((model) => checkModel(model)));
+progress.success();
 
-spinner.success(`Done!\n${bottomlog()}`);
-
-if (verbose) {
+if (options.verbose) {
   console.table(logs);
 }
 
 if (outdated.length === 0) {
-  console.log("👍 All models up-to-date!");
+  console.log("👍 All models are up-to-date!");
   process.exit(0);
 }
 
