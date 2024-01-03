@@ -8,6 +8,11 @@ function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
 program.option(
+  "-p, --parallel <number>",
+  "Number of model updates to download in parallel",
+  "1"
+);
+program.option(
   "-s, --skip <models>",
   "Models to skip (seperated by commas)",
   commaSeparatedList
@@ -23,7 +28,9 @@ program.parse();
 const options = program.opts();
 
 if (options.version) {
-  console.log("v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater");
+  console.log(
+    "v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
+  );
   process.exit(0);
 }
 
@@ -34,11 +41,22 @@ let localModels = local_models_raw.complete.map((model) => ({
   digest: model.digest,
 }));
 
-const skips = options.skip;
-if (skips) {
+if (options.skip) {
   localModels = localModels.filter(
-    (model) => !skips.includes(model.name) && !skips.includes(model.digest)
+    (model) =>
+      !options.skip.includes(model.name) && !options.skip.includes(model.digest)
   );
+}
+
+let downloadChunks = 1;
+if (options.parallel) {
+  try {
+    downloadChunks = Math.floor(Number(options.parallel));
+  } catch {
+    console.log(
+      "\n🚨 Invalid number provided for --parallel, defaulting to 1\n"
+    );
+  }
 }
 
 type Model = { name: string; digest: string };
@@ -123,14 +141,16 @@ await Promise.all(localModels.map((model) => checkModel(model)));
 
 if (options.verbose) {
   console.table(logs);
-  console.log("\n")
+  console.log("\n");
 }
 
 if (outdated.length === 0) {
   progress.success("👍 All models are up-to-date!");
   process.exit(0);
 } else {
-  progress.success(`🆙 Updates available for ${outdated.map((model) => model.name).join(", ")}`);
+  progress.success(
+    `🆙 Updates available for ${outdated.map((model) => model.name).join(", ")}`
+  );
 }
 
 if (options.confirm) {
@@ -143,8 +163,13 @@ if (options.confirm) {
   }
 }
 
-for await (const model of outdated) {
+async function updateModel(model) {
   console.log(`\n✨ Updating ${model.name}`);
   const proc = Bun.spawn(["ollama", "pull", model.name]);
   await proc.exited;
+}
+
+for (let i = 0; i < localModels.length; i += downloadChunks) {
+  const chunk = localModels.slice(i, i + downloadChunks);
+  await Promise.all(chunk.map((model) => updateModel(model)));
 }
