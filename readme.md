@@ -28,7 +28,7 @@ Options:
 [![Ollama AUR package](https://img.shields.io/aur/version/:ollamamodelupdater?logo=archlinux&label=AUR%20ollamamodelupdater)](https://aur.archlinux.org/packages/ollamamodelupdater) [![Ollama AUR package bin version](https://img.shields.io/aur/version/:ollamamodelupdater-bin?logo=archlinux&label=AUR%20ollamamodelupdater-bin)](https://aur.archlinux.org/packages/ollamamodelupdater-bin)
 
 ```sh
-yay -S ollamamodelupdater#-bin
+yay -S ollamamodelupdater # or ollamamodelupdater-bin
 ```
 
 ### From source
