@@ -4,7 +4,8 @@ The Ollama Model Updater will look at all the models you have on your system, ch
 
 ![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
 
-![CLI Demo GIF](IMAGEHERE)
+*Yes, this is real-time*
+![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/8ec7f56e-c477-4641-a397-d90b2285fa53)
 
 ## CLI Options
 
@@ -27,7 +28,7 @@ Options:
 [![Ollama AUR package](https://img.shields.io/aur/version/:ollamamodelupdater?logo=archlinux&label=AUR%20ollamamodelupdater)](https://aur.archlinux.org/packages/ollamamodelupdater) [![Ollama AUR package bin version](https://img.shields.io/aur/version/:ollamamodelupdater-bin?logo=archlinux&label=AUR%20ollamamodelupdater-bin)](https://aur.archlinux.org/packages/ollamamodelupdater-bin)
 
 ```sh
-yay -S ollamamodelupdater #-bin
+yay -S ollamamodelupdater#-bin
 ```
 
 ### From source
