@@ -17,7 +17,8 @@ Usage: update [options]
 Options:
   -s, --skip <models>  Models to skip (seperated by commas)
   -c, --confirm        Enable confirmation dialog before upgrading (default: false)
-  -v, --verbose        Verbose output (default: false)
+  -v, --verbose        Verbose output (default: false
+  --version            Print current version and exit
   -h, --help           display help for command
 ```
 
