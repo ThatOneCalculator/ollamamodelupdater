@@ -23,7 +23,7 @@ program.parse();
 const options = program.opts();
 
 if (options.version) {
-  console.log("v0.8.0 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater");
+  console.log("v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater");
   process.exit(0);
 }
 
@@ -120,20 +120,22 @@ async function checkModel(model: Model) {
 }
 
 await Promise.all(localModels.map((model) => checkModel(model)));
-progress.success();
 
 if (options.verbose) {
   console.table(logs);
+  console.log("\n")
 }
 
 if (outdated.length === 0) {
-  console.log("👍 All models are up-to-date!");
+  progress.success("👍 All models are up-to-date!");
   process.exit(0);
+} else {
+  progress.success(`🆙 Updates available for ${outdated.map((model) => model.name).join(", ")}`);
 }
 
 if (options.confirm) {
   const answer = await confirm({
-    message: `Update ${outdated.map((model) => model.name).join(", ")}?`,
+    message: "Update models?",
     default: true,
   });
   if (answer == false) {
