@@ -4,7 +4,8 @@ The Ollama Model Updater will look at all the models you have on your system, ch
 
 ![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
 
-![CLI Demo GIF](IMAGEHERE)
+*Yes, this is real-time*
+![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/8ec7f56e-c477-4641-a397-d90b2285fa53)
 
 ## CLI Options
 
@@ -26,15 +27,13 @@ Options:
 
 ### AUR
 
-[![Ollama AUR package](https://img.shields.io/aur/version/:ollamamodelupdater?logo=archlinux&label=AUR%20ollamamodelupdater)](https://aur.archlinux.org/packages/ollamamodelupdater) [![Ollama AUR package bin version](https://img.shields.io/aur/version/:ollamamodelupdater-bin?logo=archlinux&label=AUR%20ollamamodelupdater-bin)](https://aur.archlinux.org/packages/ollamamodelupdater-bin)
-
 ```sh
-yay -S ollamamodelupdater #-bin
+yay -S ollamamodelupdater # or ollamamodelupdater-bin
 ```
 
 ### From source
 
-[![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml) [![Release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml)
+[![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml)
 
 *Requires bun >= 1.0.21*
 
@@ -47,7 +46,11 @@ bun build ./update.ts --compile --minify --outfile ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
 
-Or get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
+### Prebuilt binary
+
+[![Release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/release.yml)
+
+You can also get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
 
 ```sh
 curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v0.7.0/ollamamodelupdater
