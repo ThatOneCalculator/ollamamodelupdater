@@ -1,11 +1,9 @@
-# Ollama Model Updater
+# Ollama Model Updater 🦙
 
 The Ollama Model Updater will look at all the models you have on your system, check if there is a different version on https://ollama.ai, and pull the model if there is.
 
-![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
-
 *Yes, this is real-time*
-![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/8ec7f56e-c477-4641-a397-d90b2285fa53)
+![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/aaa42a3a-81f3-4716-a825-060bddbaac40)
 
 ## CLI Options
 
