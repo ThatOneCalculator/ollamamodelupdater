@@ -4,7 +4,7 @@ The Ollama Model Updater will look at all the models you have on your system, ch
 
 ![Example with update and confirm](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/39236856-d2c0-4920-9806-d4b6383f6c00)
 
-![CLI Demo GIF](https://github.com/ThatOneCalculator/ollamamodelupdater/assets/44733677/86b5fd81-5bbc-437c-8141-cb1e94b3d701)
+![CLI Demo GIF](IMAGEHERE)
 
 ## CLI Options
 
@@ -46,6 +46,6 @@ sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 Or get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
 
 ```sh
-curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v0.5.3/ollamamodelupdater
+curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v0.6.0/ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```

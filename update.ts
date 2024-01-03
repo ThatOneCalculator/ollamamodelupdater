@@ -53,8 +53,7 @@ async function jsonhash(json: string) {
 }
 
 const spinner = new Spinner("Grabbing latest model data");
-for await (const model of localModels) {
-  spinner.update(`Checking ${model.name}\n${bottomlog()}`);
+async function checkModel(model) {
   const localdigest = model.digest;
   let [repo, tag] = model.name.split(":");
 
@@ -62,31 +61,43 @@ for await (const model of localModels) {
     repo = `library/${repo}`;
   }
 
-  const remoteModelInfo = await fetch(
-    `https://ollama.ai/v2/${repo}/manifests/${tag}`,
-    {
-      headers: {
-        Accept: "application/vnd.docker.distribution.manifest.v2+json",
-      },
-    }
-  );
-
-  if (remoteModelInfo.status == 200) {
-    const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
-
-    const hash = await jsonhash(remoteModelInfoJSON);
-    if (hash === localdigest) {
-      checked.push("✅");
-    } else {
-      checked.push("🆙");
-      notices.push(`\n🆙 Update available for ${model.name}!`);
-      outdated.push(model);
-    }
-  } else {
+  function modelError() {
     checked.push("⚠️");
     notices.push(`\n⚠️ Couldn't check ${model.name}!`);
   }
+
+  try {
+    const remoteModelInfo = await fetch(
+      `https://ollama.ai/v2/${repo}/manifests/${tag}`,
+      {
+        headers: {
+          Accept: "application/vnd.docker.distribution.manifest.v2+json",
+        },
+      }
+    );
+    spinner.update(`Checking ${model.name}\n${bottomlog()}`);
+
+    if (remoteModelInfo.status === 200) {
+      const remoteModelInfoJSON = (await remoteModelInfo.json()) as string;
+      const hash = await jsonhash(remoteModelInfoJSON);
+
+      if (hash === localdigest) {
+        checked.push("✅");
+      } else {
+        checked.push("🆙");
+        notices.push(`\n🆙 Update available for ${model.name}!`);
+        outdated.push(model);
+      }
+    } else {
+      modelError();
+    }
+  } catch (error) {
+    modelError();
+    console.error(error.message);
+  }
 }
+
+await Promise.all(localModels.map((model) => checkModel(model)));
 spinner.success(`Done!\n${bottomlog()}`);
 
 if (outdated.length === 0) {
