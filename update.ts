@@ -9,9 +9,9 @@ function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
 program.option(
-  "-p, --parallel <number>",
-  "Number of model updates to download in parallel",
-  "1"
+  "-p, --parallel",
+  "Download updates in parallel",
+  false
 );
 program.option(
   "-s, --skip <models>",
@@ -47,17 +47,6 @@ if (options.skip) {
     (model) =>
       !options.skip.includes(model.name) && !options.skip.includes(model.digest)
   );
-}
-
-let downloadChunks = 1;
-if (options.parallel) {
-  try {
-    downloadChunks = Math.min(Math.floor(Number(options.parallel)), 1);
-  } catch {
-    console.log(
-      "\n🚨 Invalid number provided for --parallel, defaulting to 1\n"
-    );
-  }
 }
 
 type Model = { name: string; digest: string };
@@ -164,31 +153,28 @@ if (options.confirm) {
   }
 }
 
-async function addModelToProgress(model, mpb) {
-  const task = `✨ Updating ${model.name}`;
-  mpb.addTask(task, { type: "percentage" });
-  await ollama.streamingPull(model.name, (chunk: string) => {
-    try {
-      const chunkMatch = chunk.match(/\d+\.\d+/);
-      if (chunk.includes("downloading") && chunkMatch) {
-        const percent = parseFloat(chunkMatch[0]) / 100;
-        if (percent === 1) {
-          mpb.done(task, { message: `🎉 Updated ${model}!` });
-        }
-        mpb.updateTask(task, { precentage: percent });
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  });
-}
-
-if (downloadChunks > 1 && outdated.length > 1) {
+if (options.paralllel && outdated.length > 1) {
   const mpb = new MultiProgressBars();
-  for (let i = 0; i < outdated.length; i += downloadChunks) {
-    const chunk = outdated.slice(i, i + downloadChunks);
-    await Promise.all(chunk.map((model) => addModelToProgress(model, mpb)));
+  for await (const model of outdated) {
+    const task = `✨ Updating ${model.name}`;
+    mpb.addTask(task, { type: "percentage" });
+    await ollama.streamingPull(model.name, (chunk: string) => {
+      try {
+        const chunkMatch = chunk.match(/\d+\.\d+/);
+        if (chunk.includes("downloading") && chunkMatch) {
+          const percent = parseFloat(chunkMatch[0]) / 100;
+          if (percent === 1) {
+            mpb.done(task, { message: `🎉 Updated ${model}!` });
+          }
+          mpb.updateTask(task, { percentage: percent });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
+  await mpb.promise;
+  console.log("\n🥳 All models updated!")
 } else {
   for await (const model of outdated) {
     console.log(`\n✨ Updating ${model.name}`);
