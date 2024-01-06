@@ -2,6 +2,7 @@ import { Ollama } from "ollama-node";
 import { Progress } from "@paperdave/logger";
 import { Command } from "commander";
 import { confirm } from "@inquirer/prompts";
+import { MultiProgressBars } from "multi-progress-bars";
 
 const program = new Command();
 function commaSeparatedList(value: string, dummyPrevious) {
@@ -163,17 +164,35 @@ if (options.confirm) {
   }
 }
 
-async function updateModel(model) {
-  console.log(`\n✨ Updating ${model.name}`);
-  const proc = Bun.spawn(["ollama", "pull", model.name]);
-  await proc.exited;
+async function addModelToProgress(model, mpb) {
+  const task = `✨ Updating ${model.name}`;
+  mpb.addTask(task, { type: "percentage" });
+  await ollama.streamingPull(model.name, (chunk: string) => {
+    try {
+      const chunkMatch = chunk.match(/\d+\.\d+/);
+      if (chunk.includes("downloading") && chunkMatch) {
+        const percent = parseFloat(chunkMatch[0]) / 100;
+        if (percent === 1) {
+          mpb.done(task, { message: `🎉 Updated ${model}!` });
+        }
+        mpb.updateTask(task, { precentage: percent });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  });
 }
 
 if (downloadChunks > 1 && outdated.length > 1) {
-  // Somehow figure out how to updateModel() without having them disrupt eachothers studout
-}
-
-for (let i = 0; i < localModels.length; i += downloadChunks) {
-  const chunk = localModels.slice(i, i + downloadChunks);
-  await Promise.all(chunk.map((model) => updateModel(model)));
+  const mpb = new MultiProgressBars();
+  for (let i = 0; i < outdated.length; i += downloadChunks) {
+    const chunk = outdated.slice(i, i + downloadChunks);
+    await Promise.all(chunk.map((model) => addModelToProgress(model, mpb)));
+  }
+} else {
+  for await (const model of outdated) {
+    console.log(`\n✨ Updating ${model.name}`);
+    const proc = Bun.spawn(["ollama", "pull", model.name]);
+    await proc.exited;
+  }
 }
