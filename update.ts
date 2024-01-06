@@ -51,7 +51,7 @@ if (options.skip) {
 let downloadChunks = 1;
 if (options.parallel) {
   try {
-    downloadChunks = Math.floor(Number(options.parallel));
+    downloadChunks = Math.min(Math.floor(Number(options.parallel)), 1);
   } catch {
     console.log(
       "\n🚨 Invalid number provided for --parallel, defaulting to 1\n"
@@ -158,7 +158,7 @@ if (options.confirm) {
     message: "Update models?",
     default: true,
   });
-  if (answer == false) {
+  if (answer === false) {
     process.exit(0);
   }
 }
@@ -167,6 +167,10 @@ async function updateModel(model) {
   console.log(`\n✨ Updating ${model.name}`);
   const proc = Bun.spawn(["ollama", "pull", model.name]);
   await proc.exited;
+}
+
+if (downloadChunks > 1 && outdated.length > 1) {
+  // Somehow figure out how to updateModel() without having them disrupt eachothers studout
 }
 
 for (let i = 0; i < localModels.length; i += downloadChunks) {
