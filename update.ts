@@ -149,6 +149,7 @@ if (options.confirm) {
     default: true,
   });
   if (answer === false) {
+    console.log("👋 Bye-bye!")
     process.exit(0);
   }
 }
