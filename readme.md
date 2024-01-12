@@ -7,17 +7,19 @@ The Ollama Model Updater will look at all the models you have on your system, ch
 
 ## CLI Options
 
+- Download models in parallel with the `-p`/`--parallel` flag
 - Skip your local models with the `-s`/`--skip` flag, i.e. `ollamaupdater -s linux-terminal:latest,test-modelfile:latest`
 - Show a confirmation dialog before updating models with the `-c`/`--confirm` flag.
 - Show a verbose table of all models, statuses, and local/remote hashes with the `-v`/`--verbose` flag
 
-```man
-Usage: update [options]
+```
+Usage: ollamamodelupdater [options]
 
 Options:
+  -p, --parallel       Download updates in parallel (default: false)
   -s, --skip <models>  Models to skip (seperated by commas)
   -c, --confirm        Enable confirmation dialog before upgrading (default: false)
-  -v, --verbose        Verbose output (default: false
+  -v, --verbose        Verbose output (default: false)
   --version            Print current version and exit
   -h, --help           display help for command
 ```

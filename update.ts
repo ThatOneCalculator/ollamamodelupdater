@@ -2,11 +2,13 @@ import { Ollama } from "ollama-node";
 import { Progress } from "@paperdave/logger";
 import { Command } from "commander";
 import { confirm } from "@inquirer/prompts";
+import { MultiProgressBars } from "multi-progress-bars";
 
 const program = new Command();
 function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
+program.option("-p, --parallel", "Download updates in parallel", true);
 program.option(
   "-s, --skip <models>",
   "Models to skip (seperated by commas)",
@@ -23,7 +25,9 @@ program.parse();
 const options = program.opts();
 
 if (options.version) {
-  console.log("v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater");
+  console.log(
+    "v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
+  );
   process.exit(0);
 }
 
@@ -34,10 +38,10 @@ let localModels = local_models_raw.complete.map((model) => ({
   digest: model.digest,
 }));
 
-const skips = options.skip;
-if (skips) {
+if (options.skip) {
   localModels = localModels.filter(
-    (model) => !skips.includes(model.name) && !skips.includes(model.digest)
+    (model) =>
+      !options.skip.includes(model.name) && !options.skip.includes(model.digest)
   );
 }
 
@@ -123,14 +127,16 @@ await Promise.all(localModels.map((model) => checkModel(model)));
 
 if (options.verbose) {
   console.table(logs);
-  console.log("\n")
+  console.log("\n");
 }
 
 if (outdated.length === 0) {
   progress.success("👍 All models are up-to-date!");
   process.exit(0);
 } else {
-  progress.success(`🆙 Updates available for ${outdated.map((model) => model.name).join(", ")}`);
+  progress.success(
+    `🆙 Updates available for ${outdated.map((model) => model.name).join(", ")}`
+  );
 }
 
 if (options.confirm) {
@@ -138,13 +144,39 @@ if (options.confirm) {
     message: "Update models?",
     default: true,
   });
-  if (answer == false) {
+  if (answer === false) {
+    console.log("👋 Bye-bye!");
     process.exit(0);
   }
 }
 
-for await (const model of outdated) {
-  console.log(`\n✨ Updating ${model.name}`);
-  const proc = Bun.spawn(["ollama", "pull", model.name]);
-  await proc.exited;
+if (options.parallel && outdated.length > 1) {
+  const mpb = new MultiProgressBars();
+  async function addTask(model) {
+    const task = `✨ Updating ${model.name}`;
+    mpb.addTask(task, { type: "percentage" });
+    await ollama.streamingPull(model.name, (chunk: string) => {
+      try {
+        const chunkMatch = chunk.match(/\d+\.\d+/);
+        if (chunk.includes("downloading") && chunkMatch) {
+          const percent = parseFloat(chunkMatch[0]) / 100;
+          if (percent === 1) {
+            mpb.done(task, { message: `🎉 Updated ${model.name}!` });
+          }
+          mpb.updateTask(task, { percentage: percent });
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }
+  await Promise.all(outdated.map((model) => addTask(model)));
+  await mpb.promise;
+  console.log("\n🥳 All models updated!");
+} else {
+  for await (const model of outdated) {
+    console.log(`\n✨ Updating ${model.name}`);
+    const proc = Bun.spawn(["ollama", "pull", model.name]);
+    await proc.exited;
+  }
 }
