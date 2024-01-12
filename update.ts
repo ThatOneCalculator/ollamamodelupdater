@@ -8,11 +8,7 @@ const program = new Command();
 function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
-program.option(
-  "-p, --parallel",
-  "Download updates in parallel",
-  false
-);
+program.option("-p, --parallel", "Download updates in parallel", true);
 program.option(
   "-s, --skip <models>",
   "Models to skip (seperated by commas)",
@@ -149,14 +145,14 @@ if (options.confirm) {
     default: true,
   });
   if (answer === false) {
-    console.log("👋 Bye-bye!")
+    console.log("👋 Bye-bye!");
     process.exit(0);
   }
 }
 
-if (options.paralllel && outdated.length > 1) {
+if (options.parallel && outdated.length > 1) {
   const mpb = new MultiProgressBars();
-  for await (const model of outdated) {
+  async function addTask(model) {
     const task = `✨ Updating ${model.name}`;
     mpb.addTask(task, { type: "percentage" });
     await ollama.streamingPull(model.name, (chunk: string) => {
@@ -165,7 +161,7 @@ if (options.paralllel && outdated.length > 1) {
         if (chunk.includes("downloading") && chunkMatch) {
           const percent = parseFloat(chunkMatch[0]) / 100;
           if (percent === 1) {
-            mpb.done(task, { message: `🎉 Updated ${model}!` });
+            mpb.done(task, { message: `🎉 Updated ${model.name}!` });
           }
           mpb.updateTask(task, { percentage: percent });
         }
@@ -174,8 +170,9 @@ if (options.paralllel && outdated.length > 1) {
       }
     });
   }
+  await Promise.all(outdated.map((model) => addTask(model)));
   await mpb.promise;
-  console.log("\n🥳 All models updated!")
+  console.log("\n🥳 All models updated!");
 } else {
   for await (const model of outdated) {
     console.log(`\n✨ Updating ${model.name}`);
