@@ -26,7 +26,7 @@ const options = program.opts();
 
 if (options.version) {
   console.log(
-    "v0.8.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
+    "v1.0.0 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
   );
   process.exit(0);
 }

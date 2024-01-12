@@ -36,7 +36,7 @@ yay -S ollamamodelupdater # or ollamamodelupdater-bin
 
 [![Bun Compile](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml/badge.svg)](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/actions/workflows/main.yml)
 
-*Requires bun >= 1.0.21*
+*Requires bun >= 1.0.22*
 
 You can compile and install the executable with
 
@@ -54,6 +54,6 @@ sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 You can also get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
 
 ```sh
-curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v0.8.1/ollamamodelupdater
+curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v1.0.0/ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
