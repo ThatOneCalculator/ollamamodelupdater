@@ -26,7 +26,7 @@ const options = program.opts();
 
 if (options.version) {
   console.log(
-    "v1.0.0 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
+    "v1.0.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater"
   );
   process.exit(0);
 }
@@ -160,10 +160,10 @@ if (options.parallel && outdated.length > 1) {
         const chunkMatch = chunk.match(/\d+\.\d+/);
         if (chunk.includes("downloading") && chunkMatch) {
           const percent = parseFloat(chunkMatch[0]) / 100;
+          mpb.updateTask(task, { percentage: percent });
           if (percent === 1) {
             mpb.done(task, { message: `🎉 Updated ${model.name}!` });
           }
-          mpb.updateTask(task, { percentage: percent });
         }
       } catch (error) {
         console.error(error);
@@ -173,6 +173,7 @@ if (options.parallel && outdated.length > 1) {
   await Promise.all(outdated.map((model) => addTask(model)));
   await mpb.promise;
   console.log("\n🥳 All models updated!");
+  process.exit(0);
 } else {
   for await (const model of outdated) {
     console.log(`\n✨ Updating ${model.name}`);

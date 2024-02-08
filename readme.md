@@ -54,6 +54,6 @@ sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 You can also get the prebuilt Linux binary from the [latest release](https://github.com/ThatOneCalculator/ollamamodelupdater-bun/releases/latest).
 
 ```sh
-curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v1.0.0/ollamamodelupdater
+curl -OL https://github.com/thatonecalculator/ollamamodelupdater/releases/download/v1.0.1/ollamamodelupdater
 sudo install -Dm755 ./ollamamodelupdater /usr/bin/ollamamodelupdater
 ```
