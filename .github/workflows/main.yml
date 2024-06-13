@@ -11,5 +11,5 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Compile executable (Linux)
-        run: bun build ./update.ts --compile --minify --outfile ollamamodelupdater
+        run: bun run build
 

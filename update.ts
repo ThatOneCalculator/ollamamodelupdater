@@ -1,8 +1,9 @@
-import ollama from "ollama";
+import { confirm } from "@inquirer/prompts";
 import { Progress } from "@paperdave/logger";
 import { Command } from "commander";
-import { confirm } from "@inquirer/prompts";
 import { MultiProgressBars } from "multi-progress-bars";
+import ollama from "ollama";
+import { version } from "./package.json";
 
 const program = new Command();
 function commaSeparatedList(value: string, dummyPrevious) {
@@ -26,7 +27,7 @@ const options = program.opts();
 
 if (options.version) {
 	console.log(
-		"v1.0.1 of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater",
+		`v${version} of ollamamodelupdater\nhttps://github.com/ThatOneCalculator/ollamamodelupdater`,
 	);
 	process.exit(0);
 }
@@ -84,7 +85,7 @@ async function checkModel(model: Model) {
 	}
 
 	const remoteModelInfo = await fetch(
-		`https://ollama.ai/v2/${repo}/manifests/${tag}`,
+		`https://ollama.com/v2/${repo}/manifests/${tag}`,
 		{
 			headers: {
 				Accept: "application/vnd.docker.distribution.manifest.v2+json",
