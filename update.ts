@@ -8,7 +8,7 @@ const program = new Command();
 function commaSeparatedList(value: string, dummyPrevious) {
   return value.split(",");
 }
-program.option("-p, --parallel", "Download updates in parallel", true);
+program.option("-p, --parallel", "Download updates in parallel", false);
 program.option(
   "-s, --skip <models>",
   "Models to skip (seperated by commas)",
