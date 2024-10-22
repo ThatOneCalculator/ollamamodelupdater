@@ -1,14 +1,14 @@
 {
 	"version": "1.1.1",
 	"dependencies": {
-		"@inquirer/prompts": "^3.3.2",
+		"@inquirer/prompts": "^7.0.0",
 		"@paperdave/logger": "^3.0.1",
-		"commander": "^11.1.0",
+		"commander": "^12.1.0",
 		"multi-progress-bars": "^5.0.3",
-		"ollama": "^0.5.1"
+		"ollama": "^0.5.9"
 	},
 	"devDependencies": {
-		"@types/bun": "^1.1.4"
+		"@types/bun": "^1.1.11"
 	},
 	"scripts": {
 		"check": "biome check update.ts --write ",
